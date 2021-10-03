@@ -1,9 +1,17 @@
 # Streamlabs Socket Demo
 
+## StreamElements API Documentation
+
+https://dev.streamelements.com/docs/kappa/docs/Websockets.md
+
+## Running demo
+
 1) Run `npm install`
 
-2) copy your Socket API Token from https://streamlabs.com/dashboard/settings/api-settings and set the SOCKET_API_TOKEN value in .env file
+2) copy your JWT by clicking Show secrets from StreamElements channel: https://streamelements.com/dashboard/account/channels
 
-3) Run `node index.js`
+3) paste your JWT value into the .env file
 
-4) Trigger test alert from streamlabs
+4) Run `node index.js`
+
+5) Trigger test alerts to see message payloads
