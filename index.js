@@ -6,37 +6,56 @@ const port = 8080
 const io = require('socket.io-client');
 
 app.listen(port, () => {
-  var socketToken = process.env.SOCKET_API_TOKEN
+  // JWT is available here: https://streamelements.com/dashboard/account/channels
+  var jwt = process.env.JWT
+  //https://realtime.streamelements.com
   var socketUrl = process.env.SOCKET_URL
 
-  const url = `${socketUrl}?token=${socketToken}`
-  socket = io(url, { transports: ['websocket'] })
-
-  //see https://dev.streamlabs.com/docs/socket-api for event types
-  socket.on("event", (e) => {
-    if (e.for === "youtube_account") {
-      console.log('eventData: ', e)
-    }
-    else if (e.for === "streamlabs") {
-      console.log('eventData: ', e)
-    }
+  const socket = io(socketUrl, {
+    transports: ['websocket']
+  });
+  // Socket connected
+  socket.on('connect', onConnect);
+  // Socket got disconnected
+  socket.on('disconnect', onDisconnect);
+  // Socket is authenticated
+  socket.on('authenticated', onAuthenticated);
+  socket.on('unauthorized', console.error);
+  socket.on('event:test', (data) => {
+    console.log(data);
+    // Structure as on https://github.com/StreamElements/widgets/blob/master/CustomCode.md#on-event
+  });
+  socket.on('event', (data) => {
+    console.log(data);
+    // Structure as on https://github.com/StreamElements/widgets/blob/master/CustomCode.md#on-event
+  });
+  socket.on('event:update', (data) => {
+    console.log(data);
+    // Structure as on https://github.com/StreamElements/widgets/blob/master/CustomCode.md#on-session-update
+  });
+  socket.on('event:reset', (data) => {
+    console.log(data);
+    // Structure as on https://github.com/StreamElements/widgets/blob/master/CustomCode.md#on-session-update
   });
 
-  socket.on('connect_timeout', (e) => console.log("Connection Timeout", e))
-  socket.on('error', (e) => console.log("Error", e))
-  socket.on("connect_error", (error) => {
-    setTimeout(() => {
-      console.log(error)
-      console.log("Connecting...")
-      socket.connect();
-    }, 1000);
-  });
-  socket.on("connect", () => {
-    console.log("Connected");
-  });
-  socket.on("disconnect", () => {
-    console.log("Disconnected");
-  });
+
+  function onConnect() {
+    console.log('Successfully connected to the websocket');
+    //socket.emit('authenticate', { method: 'oauth2', token: accessToken });
+    socket.emit('authenticate', {method: 'jwt', token: jwt});
+  }
+
+  function onDisconnect() {
+    console.log('Disconnected from websocket');
+    // Reconnect
+  }
+
+  function onAuthenticated(data) {
+    const {
+      channelId
+    } = data;
+    console.log(`Successfully connected to channel ${channelId}`);
+  }
 
   socket.connect()
 })
