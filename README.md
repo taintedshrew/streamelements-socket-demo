@@ -1,4 +1,4 @@
-# Streamlabs Socket Demo
+# StreamElements Socket Demo
 
 ## StreamElements API Documentation
 
